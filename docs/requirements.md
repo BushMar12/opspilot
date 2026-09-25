@@ -129,6 +129,25 @@ The system shall record significant operational events in an audit trail.
 **FR-021**  
 Audit records shall include sufficient information to determine what action occurred, when it occurred and which user or system component initiated it.
 
+### Workflow State Management
+
+**FR-022**  
+The system shall maintain explicit state for refund recommendations and approval requests.
+
+**FR-023**  
+The system shall prevent invalid approval-request state transitions.
+
+**FR-024**  
+A refund recommendation requiring approval shall not become eligible for execution until the associated approval request has been approved.
+
+**FR-025**  
+A rejected approval request shall prevent execution of the associated refund recommendation.
+
+**FR-026**  
+The system shall record significant state transitions as audit events.
+
+**FR-027**  
+The actual refund transaction shall remain the responsibility of an external refund-processing service rather than the AI reasoning layer.
 
 ## Initial Non-Functional Requirements
 
