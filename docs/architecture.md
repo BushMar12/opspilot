@@ -240,3 +240,74 @@ For example:
 - The external refund service controls the actual `RefundTransaction`.
 
 This separation prevents OpsPilot from incorrectly becoming the source of truth for external business systems.
+
+## Initial API Design
+
+OpsPilot will expose an HTTP API that provides controlled access to application functionality.
+
+The API acts as a boundary between clients and OpsPilot's internal implementation. Clients should interact with documented API contracts rather than directly accessing application databases or internal implementation details.
+
+### Initial Endpoints
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| GET | `/health` | Verify that the OpsPilot API is running |
+| GET | `/customers/{customer_id}` | Retrieve a customer by identifier |
+| GET | `/customers/{customer_id}/orders` | Retrieve orders belonging to a customer |
+| GET | `/orders/{order_id}` | Retrieve an order by identifier |
+| POST | `/refund-recommendations` | Create a refund recommendation |
+| GET | `/refund-recommendations/{recommendation_id}` | Retrieve a refund recommendation |
+| POST | `/approval-requests` | Create an approval request |
+| GET | `/approval-requests/{approval_id}` | Retrieve an approval request |
+| POST | `/approval-requests/{approval_id}/approve` | Approve a pending approval request |
+| POST | `/approval-requests/{approval_id}/reject` | Reject a pending approval request |
+
+### API Responsibilities
+
+The API layer is responsible for:
+
+- receiving HTTP requests;
+- validating request structure;
+- identifying request parameters;
+- invoking appropriate application services;
+- translating application results into HTTP responses;
+- returning appropriate HTTP status codes.
+
+The API layer should not contain complex business rules.
+
+### Business Service Responsibilities
+
+Application services are responsible for implementing business behaviour such as:
+
+- retrieving business entities through repositories or external services;
+- evaluating deterministic business rules;
+- enforcing valid state transitions;
+- coordinating refund recommendations;
+- coordinating approval workflows;
+- recording relevant audit events.
+
+### Data Access Responsibilities
+
+Repositories or external service clients are responsible for retrieving and persisting structured business data.
+
+The API layer should not contain direct database queries.
+
+### Initial Architectural Style
+
+OpsPilot will initially be implemented as a modular monolith rather than a microservice architecture.
+
+The application will run as one deployable backend while maintaining clear internal boundaries between:
+
+- API handling;
+- business logic;
+- data access;
+- AI functionality;
+- workflow orchestration.
+
+This approach keeps the system simple enough for a single-developer project while preserving maintainable architecture.
+
+### API Design Principle
+
+API contracts should describe business capabilities rather than expose internal implementation details.
+
+For example, OpsPilot exposes a refund recommendation operation rather than providing clients direct access to AI prompts, database tables or model internals.
