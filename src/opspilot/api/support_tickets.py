@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 
 from opspilot.models import SupportTicket, SupportTicketCreate
+from opspilot.services.support_tickets import SupportTicketService
 
 
 router = APIRouter(
@@ -8,9 +9,7 @@ router = APIRouter(
     tags=["support-tickets"],
 )
 
-
-support_tickets: dict[str, SupportTicket] = {}
-
+service = SupportTicketService()
 
 @router.post(
     "",
@@ -18,25 +17,32 @@ support_tickets: dict[str, SupportTicket] = {}
     status_code=status.HTTP_201_CREATED,
 )
 def create_support_ticket(ticket_data: SupportTicketCreate) -> SupportTicket:
-    ticket_id = f"TKT-{len(support_tickets) + 1:04d}"
+    return service.create_ticket(ticket_data)
 
-    ticket = SupportTicket(
-        ticket_id=ticket_id,
-        customer_id=ticket_data.customer_id,
-        order_id=ticket_data.order_id,
-        subject=ticket_data.subject,
-        description=ticket_data.description,
-        status="open",
-    )
-
-    support_tickets[ticket_id] = ticket
-
-    return ticket
 
 @router.get("/{ticket_id}", response_model=SupportTicket)
 def get_support_ticket(ticket_id: str) -> SupportTicket:
-    ticket = support_tickets.get(ticket_id)
+    ticket = service.get_ticket(ticket_id)
 
+    if ticket is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Support ticket {ticket_id} not found",
+        )
+    return ticket
+
+@router.post(f"/{ticket_id}/resolve", response_model=SupportTicket)
+def resolve_support_ticket(ticket_id: str) -> SupportTicket:
+    try:
+        ticket = service.resolve_ticket(ticket_id)
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=409,
+            detail=str(exc),
+        ) from exc
+        
+        
     if ticket is None:
         raise HTTPException(
             status_code=404,
