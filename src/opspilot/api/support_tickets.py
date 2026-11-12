@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 
 from opspilot.models import SupportTicket, SupportTicketCreate
 from opspilot.services.support_tickets import SupportTicketService
+from opspilot.repositories.support_tickets import SupportTicketRepository
 
 
 router = APIRouter(
@@ -9,7 +10,11 @@ router = APIRouter(
     tags=["support-tickets"],
 )
 
-service = SupportTicketService()
+repository = SupportTicketRepository()
+
+service = SupportTicketService(
+    repository=repository
+)
 
 @router.post(
     "",
@@ -31,7 +36,7 @@ def get_support_ticket(ticket_id: str) -> SupportTicket:
         )
     return ticket
 
-@router.post(f"/{ticket_id}/resolve", response_model=SupportTicket)
+@router.post("/{ticket_id}/resolve", response_model=SupportTicket)
 def resolve_support_ticket(ticket_id: str) -> SupportTicket:
     try:
         ticket = service.resolve_ticket(ticket_id)

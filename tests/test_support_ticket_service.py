@@ -1,8 +1,10 @@
 from opspilot.models import SupportTicketCreate
 from opspilot.services.support_tickets import SupportTicketService
+from opspilot.repositories.support_tickets import SupportTicketRepository
 
 def test_service_creates_open_ticket() -> None:
-    service = SupportTicketService()
+    repository = SupportTicketRepository()
+    service = SupportTicketService(repository=repository)
 
     ticket_data = SupportTicketCreate(
         customer_id="CUS-1827",
@@ -16,7 +18,8 @@ def test_service_creates_open_ticket() -> None:
     assert ticket.ticket_id == "TKT-0001"
 
 def test_service_can_retrieve_created_ticket() -> None:
-    service = SupportTicketService()
+    repository = SupportTicketRepository()
+    service = SupportTicketService(repository=repository)
 
     ticket_data = SupportTicketCreate(
         customer_id="CUS-1827",
@@ -30,14 +33,16 @@ def test_service_can_retrieve_created_ticket() -> None:
     assert retrieved_ticket == created_ticket
 
 def test_service_returns_none_for_missing_ticket() -> None:
-    service = SupportTicketService()
+    repository = SupportTicketRepository()
+    service = SupportTicketService(repository=repository)
 
     result = service.get_ticket("TKT-9999")
 
     assert result is None
 
 def test_service_resolves_ticket() -> None:
-    service = SupportTicketService()
+    repository = SupportTicketRepository()
+    service = SupportTicketService(repository=repository)
 
     ticket = service.create_ticket(
         SupportTicketCreate(
