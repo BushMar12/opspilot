@@ -1,4 +1,7 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
+from typing import Annotated
+
+from opspilot.dependencies import get_support_ticket_service
 
 from opspilot.models import SupportTicket, SupportTicketCreate
 from opspilot.services.support_tickets import SupportTicketService
@@ -10,20 +13,19 @@ router = APIRouter(
     tags=["support-tickets"],
 )
 
-repository = InMemorySupportTicketRepository()
-service = SupportTicketService(repository=repository)
+SupportTicketServiceDep = Annotated[SupportTicketService, Depends(get_support_ticket_service)]
 
 @router.post(
     "",
     response_model=SupportTicket,
     status_code=status.HTTP_201_CREATED,
 )
-def create_support_ticket(ticket_data: SupportTicketCreate) -> SupportTicket:
+def create_support_ticket(ticket_data: SupportTicketCreate, service: SupportTicketServiceDep) -> SupportTicket:
     return service.create_ticket(ticket_data)
 
 
 @router.get("/{ticket_id}", response_model=SupportTicket)
-def get_support_ticket(ticket_id: str) -> SupportTicket:
+def get_support_ticket(ticket_id: str, service: SupportTicketServiceDep) -> SupportTicket:
     ticket = service.get_ticket(ticket_id)
 
     if ticket is None:
@@ -34,7 +36,7 @@ def get_support_ticket(ticket_id: str) -> SupportTicket:
     return ticket
 
 @router.post("/{ticket_id}/resolve", response_model=SupportTicket)
-def resolve_support_ticket(ticket_id: str) -> SupportTicket:
+def resolve_support_ticket(ticket_id: str, service: SupportTicketServiceDep) -> SupportTicket:
     try:
         ticket = service.resolve_ticket(ticket_id)
 

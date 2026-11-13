@@ -1,12 +1,27 @@
+import pytest
+
 from fastapi.testclient import TestClient
 
 from opspilot.main import app
 
+from opspilot.dependencies import get_support_ticket_service
 
-client = TestClient(app)
+from opspilot.repositories.support_tickets import InMemorySupportTicketRepository
+from opspilot.services.support_tickets import SupportTicketService
 
+@pytest.fixture
+def client() -> TestClient:
+    repository = InMemorySupportTicketRepository()
+    service = SupportTicketService(repository)
 
-def test_create_support_ticket() -> None:
+    app.dependency_overrides[get_support_ticket_service] = lambda: service
+
+    with TestClient(app) as test_client:
+        yield test_client
+
+    app.dependency_overrides.clear()
+
+def test_create_support_ticket(client: TestClient) -> None:
     response = client.post(
         "/support-tickets",
         json={
@@ -28,7 +43,7 @@ def test_create_support_ticket() -> None:
     assert body["ticket_id"].startswith("TKT-")
 
 
-def test_create_support_ticket_rejects_short_description() -> None:
+def test_create_support_ticket_rejects_short_description(client: TestClient) -> None:
     response = client.post(
         "/support-tickets",
         json={
@@ -40,7 +55,7 @@ def test_create_support_ticket_rejects_short_description() -> None:
 
     assert response.status_code == 422
 
-def test_get_created_support_ticket() -> None:
+def test_get_created_support_ticket(client: TestClient) -> None:
     create_response = client.post(
         "/support-tickets",
         json={
