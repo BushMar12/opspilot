@@ -1,9 +1,10 @@
+from datetime import datetime, timezone
 from opspilot.models import SupportTicketCreate
 from opspilot.services.support_tickets import SupportTicketService
-from opspilot.repositories.support_tickets import SupportTicketRepository
+from opspilot.repositories.support_tickets import InMemorySupportTicketRepository
 
 def test_service_creates_open_ticket() -> None:
-    repository = SupportTicketRepository()
+    repository = InMemorySupportTicketRepository()
     service = SupportTicketService(repository=repository)
 
     ticket_data = SupportTicketCreate(
@@ -18,7 +19,7 @@ def test_service_creates_open_ticket() -> None:
     assert ticket.ticket_id == "TKT-0001"
 
 def test_service_can_retrieve_created_ticket() -> None:
-    repository = SupportTicketRepository()
+    repository = InMemorySupportTicketRepository()
     service = SupportTicketService(repository=repository)
 
     ticket_data = SupportTicketCreate(
@@ -33,7 +34,7 @@ def test_service_can_retrieve_created_ticket() -> None:
     assert retrieved_ticket == created_ticket
 
 def test_service_returns_none_for_missing_ticket() -> None:
-    repository = SupportTicketRepository()
+    repository = InMemorySupportTicketRepository()
     service = SupportTicketService(repository=repository)
 
     result = service.get_ticket("TKT-9999")
@@ -41,7 +42,7 @@ def test_service_returns_none_for_missing_ticket() -> None:
     assert result is None
 
 def test_service_resolves_ticket() -> None:
-    repository = SupportTicketRepository()
+    repository = InMemorySupportTicketRepository()
     service = SupportTicketService(repository=repository)
 
     ticket = service.create_ticket(

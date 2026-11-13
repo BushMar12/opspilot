@@ -1,8 +1,10 @@
+from datetime import datetime, timezone
+
 from opspilot.models import SupportTicket, SupportTicketCreate
-from opspilot.repositories.support_tickets import SupportTicketRepository
+from opspilot.repositories.support_tickets import SupportTicketRepositoryProtocol
 
 class SupportTicketService:
-    def __init__(self, repository: SupportTicketRepository) -> None:
+    def __init__(self, repository: SupportTicketRepositoryProtocol) -> None:
         self._repository = repository
 
     def create_ticket(self, ticket_data: SupportTicketCreate) -> SupportTicket:
@@ -15,6 +17,7 @@ class SupportTicketService:
             subject=ticket_data.subject,
             description=ticket_data.description,
             status="open",
+            created_at=datetime.now(timezone.utc)
         )
 
         return self._repository.save(ticket)

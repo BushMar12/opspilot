@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from datetime import datetime
 
 class Customer(BaseModel):
     customer_id: str
@@ -19,3 +20,4 @@ class SupportTicket(BaseModel):
     subject: str
     description: str
     status: str
+    created_at: datetime

@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 
 from opspilot.models import SupportTicket, SupportTicketCreate
 from opspilot.services.support_tickets import SupportTicketService
-from opspilot.repositories.support_tickets import SupportTicketRepository
+from opspilot.repositories.support_tickets import InMemorySupportTicketRepository
 
 
 router = APIRouter(
@@ -10,11 +10,8 @@ router = APIRouter(
     tags=["support-tickets"],
 )
 
-repository = SupportTicketRepository()
-
-service = SupportTicketService(
-    repository=repository
-)
+repository = InMemorySupportTicketRepository()
+service = SupportTicketService(repository=repository)
 
 @router.post(
     "",
