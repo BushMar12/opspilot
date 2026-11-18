@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
+from decimal import Decimal
 
 class Customer(BaseModel):
     customer_id: str
@@ -7,6 +8,14 @@ class Customer(BaseModel):
     email: str
     account_status: str
 
+class Order(BaseModel):
+    order_id: str
+    customer_id: str
+    status: str
+    order_date: datetime
+    delivery_date: datetime | None = None
+    total_amount: Decimal = Field(ge=Decimal("0.00"))
+    
 class SupportTicketCreate(BaseModel):
     customer_id: str
     order_id: str | None = None

@@ -7,12 +7,14 @@ from opspilot.main import app
 from opspilot.dependencies import get_support_ticket_service
 
 from opspilot.repositories.support_tickets import InMemorySupportTicketRepository
+from opspilot.repositories.orders import InMemoryOrderRepository
 from opspilot.services.support_tickets import SupportTicketService
 
 @pytest.fixture
 def client() -> TestClient:
     repository = InMemorySupportTicketRepository()
-    service = SupportTicketService(repository)
+    order_repository = InMemoryOrderRepository()
+    service = SupportTicketService(repository, order_repository)
 
     app.dependency_overrides[get_support_ticket_service] = lambda: service
 

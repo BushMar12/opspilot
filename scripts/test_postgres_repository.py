@@ -2,10 +2,12 @@ from opspilot.db.database import SessionLocal
 from opspilot.models import SupportTicketCreate
 from opspilot.repositories.support_tickets import PostgresSupportTicketRepository
 from opspilot.services.support_tickets import SupportTicketService
+from opspilot.repositories.orders import PostgresOrderRepository
 
 def main() -> None:
     repository = PostgresSupportTicketRepository(SessionLocal)
-    service = SupportTicketService(repository)
+    order_repository = PostgresOrderRepository(SessionLocal)
+    service = SupportTicketService(repository, order_repository)
 
     ticket = service.create_ticket(SupportTicketCreate(
         customer_id="CUS-1827",
