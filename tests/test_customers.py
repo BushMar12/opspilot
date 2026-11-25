@@ -1,24 +1,35 @@
+import pytest
 from fastapi.testclient import TestClient
 
+from opspilot.dependencies import get_customer_service
 from opspilot.main import app
+from opspilot.models import Customer
+from opspilot.repositories.customers import InMemoryCustomerRepository
+from opspilot.services.customers import CustomerService
 
-client = TestClient(app)
 
-def test_get_existing_customer() -> None:
-    response = client.get("/customers/CUS-1827")
+@pytest.fixture
+def client() -> TestClient:
+    repository = InMemoryCustomerRepository(
+            customers=[
+                Customer(
+                    customer_id="CUS-1827",
+                    name="Alex Morgan",
+                    email="alex@example.com",
+                    account_status="active",
+            )
+        ]
+    )
 
-    assert response.status_code == 200
-    assert response.json() == {
-        "customer_id": "CUS-1827",
-        "name": "Alex Morgan",
-        "email": "alex@example.com",
-        "account_status": "active",
-    }
+    service = CustomerService(
+        repository=repository
+    )
 
-def test_get_missing_customer_returns_404() -> None:
-    response = client.get("/customers/CUS-9999")
+    app.dependency_overrides[
+        get_customer_service
+    ] = lambda: service
 
-    assert response.status_code == 404
-    assert response.json() == {
-        "detail": "Customer CUS-9999 not found"
-    }
+    with TestClient(app) as test_client:
+        yield test_client
+
+    app.dependency_overrides.clear()

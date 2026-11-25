@@ -8,7 +8,7 @@ from opspilot.services.support_tickets import SupportTicketService
 from opspilot.repositories.support_tickets import InMemorySupportTicketRepository
 from opspilot.repositories.orders import InMemoryOrderRepository
 
-from opspilot.exceptions import OrderNotFoundError, OrderCustomerMismatchError
+from opspilot.exceptions import OrderNotFoundError, OrderCustomerMismatchError, CustomerNotFoundError
 
 
 router = APIRouter(
@@ -32,6 +32,9 @@ def create_support_ticket(ticket_data: SupportTicketCreate, service: SupportTick
 
     except OrderCustomerMismatchError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+    except CustomerNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 @router.get("/{ticket_id}", response_model=SupportTicket)
 def get_support_ticket(ticket_id: str, service: SupportTicketServiceDep) -> SupportTicket:

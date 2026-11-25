@@ -17,17 +17,11 @@ class InMemorySupportTicketRepository:
     def get_by_id(self, ticket_id: str) -> SupportTicket | None:
         return self._tickets.get(ticket_id)
 
-    def count(self) -> int:
-        return len(self._tickets)
-
 class SupportTicketRepositoryProtocol(Protocol):
     def save(self, ticket: SupportTicket) -> SupportTicket:
         ...
 
     def get_by_id(self, ticket_id: str) -> SupportTicket | None:
-        ...
-
-    def count(self) -> int:
         ...
 
 class PostgresSupportTicketRepository:
@@ -76,8 +70,3 @@ class PostgresSupportTicketRepository:
             status=row.status,
             created_at=row.created_at,
         )
-
-    def count(self) -> int:
-        statement = select(func.count(SupportTicketRow.ticket_id))
-
-        return self._session.scalar(statement) or 0
