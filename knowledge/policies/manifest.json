@@ -1,0 +1,29 @@
+[
+    {
+        "document_id": "POL-001",
+        "title": "Refund and Return Policy",
+        "version": "1.0",
+        "category": "refund",
+        "effective_from": "2026-01-01",
+        "status": "active",
+        "source_path": "refund_policy.md"
+    },
+    {
+        "document_id": "POL-002",
+        "title": "Refund Approval Policy",
+        "version": "1.0",
+        "category": "approval",
+        "effective_from": "2026-01-01",
+        "status": "active",
+        "source_path": "approval_policy.md"
+    },
+    {
+        "document_id": "POL-003",
+        "title": "Delivery Issue Policy",
+        "version": "1.0",
+        "category": "delivery",
+        "effective_from": "2026-01-01",
+        "status": "active",
+        "source_path": "delivery_policy.md"
+    }
+]
